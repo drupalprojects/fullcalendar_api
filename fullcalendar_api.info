@@ -3,3 +3,5 @@ description = API interface for jQuery FullCalendar plugin, http://fullcalendar.
 core = 7.x
 dependencies[] = date
 dependencies[] = entity
+dependencies[] = jquery_update
+dependencies[] = libraries

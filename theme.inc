@@ -13,8 +13,6 @@
  *   calendar_settings array of settings to override FullCalendar.js defaults
  */
 function theme_fullcalendar_calendar($vars) {
-  $events = $vars['events'];
-  $date_field = $vars['date_field'];
   $user_settings = $vars['calendar_settings'];
 
   // Default settings.
@@ -29,8 +27,33 @@ function theme_fullcalendar_calendar($vars) {
     'events' => array(),
   );
 
-  // Merge default settings with user settings.
+  // Override defaults with user submitted data.
   $settings = array_replace_recursive($settings, $user_settings);
+
+  // Add fullcalendar scripts.
+  libraries_load('fullcalendar');
+  drupal_add_js(drupal_get_path('module', 'fullcalendar_api') . '/fullcalendar_calendar.js');
+  drupal_add_js(array('fullcalendar_api' => array('calendarSettings' => $settings)), 'setting');
+
+  return array(
+    '#markup' => '<div id="fullcalendar"></div>',
+  );
+}
+
+
+/**
+ * Theme function for fullcalendar_calendar_entity.
+ * Renders an array of entities with date fields as calendar items.
+ *
+ * @params
+ *   events array of event objects
+ *   date_field string field name of valid date field
+ *   calendar_settings array of settings to override FullCalendar.js defaults
+ */
+function theme_fullcalendar_calendar_entity($vars) {
+  $events = $vars['events'];
+  $date_field = $vars['date_field'];
+  $settings = $vars['calendar_settings'];
 
   // Check if field is valid date type.
   $date_field_info = field_info_field($date_field);
@@ -83,13 +106,8 @@ function theme_fullcalendar_calendar($vars) {
     $settings['events'][] = $event_array;
   }
 
-  // At this point validation is complete and we can add the extra scripts 
-  // to the page.
-  libraries_load('fullcalendar');
-  drupal_add_js(drupal_get_path('module', 'fullcalendar_api') . '/fullcalendar_calendar.js');
-  drupal_add_js(array('fullcalendar_api' => array('calendarSettings' => $settings)), 'setting');
+  // At this point validation is complete. 
+  // Pass the settings data to the theme_fullcalendar_calendar function.
 
-  return array(
-    '#markup' => '<div id="fullcalendar"></div>',
-  );
+  return theme('fullcalendar_calendar', array('calendar_settings' => $settings));
 }

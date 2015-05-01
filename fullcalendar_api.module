@@ -45,7 +45,7 @@ function fullcalendar_api_theme($existing, $type, $theme, $path) {
     'fullcalendar_calendar_entity' => array(
       'file' => 'theme.inc',
       'variables' => array(
-        'events' => array(NULL),
+        'entities' => array(NULL),
         'date_field' => NULL,
         'calendar_settings' => array(NULL),
       ),

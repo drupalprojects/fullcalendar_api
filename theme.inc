@@ -46,12 +46,12 @@ function theme_fullcalendar_calendar($vars) {
  * Renders an array of entities with date fields as calendar items.
  *
  * @params
- *   events array of event objects
+ *   entities array of event objects
  *   date_field string field name of valid date field
  *   calendar_settings array of settings to override FullCalendar.js defaults
  */
 function theme_fullcalendar_calendar_entity($vars) {
-  $events = $vars['events'];
+  $entities = $vars['entities'];
   $date_field = $vars['date_field'];
   $settings = $vars['calendar_settings'];
 
@@ -64,46 +64,50 @@ function theme_fullcalendar_calendar_entity($vars) {
     throw new Exception(t('Field name %field_name is not a valid date field.', array('%field_name' => $date_field)));
   }
 
-  foreach ($events as $event) {
+  foreach ($entities as $entity) {
+
+    $wr_entity = entity_metadata_wrapper('node', $entity);
+
     $start = NULL;
     $end = NULL;
 
     // If the date type is not "datestamp" (timestamp), pass the string to 
     // DateTime constructor. It will automatically detect the date format and 
     // give us a timestamp.
-    switch ($event->{$date_field}['und'][0]['date_type']) {
+    switch ($wr_entity->{$date_field}->value()['date_type']) {
       case 'date':
       case 'datetime':
         // @todo timezone?
-        $dateTime = new DateTime($event->{$date_field}['und'][0]['value']);
+        $dateTime = new DateTime($wr_entity->{$date_field}->value()['value']);
         $start = $dateTime->getTimestamp();
 
         // if end date
-        if (!empty($event->{$date_field}['und'][0]['value2'])) {
+        if (!empty($wr_entity->{$date_field}->value()['value2'])) {
           // @todo timezone?
-          $endDateTime = new DateTime($event->{$date_field}['und'][0]['value2']);
+          $endDateTime = new DateTime($wr_entity->{$date_field}->value()['value2']);
           $end = $endDateTime->getTimestamp();
         }
         break;
       case 'datestamp':
         // Date value is already a timestamp.
-        $start = $event->{$date_field}['und'][0]['value'];
+        $start = $wr_entity->{$date_field}->value()['value'];
         // if end date
-        if (!empty($event->{$date_field}['und'][0]['value2'])) {
-          $end = $event->{$date_field}['und'][0]['value2'];
+        if (!empty($wr_entity->{$date_field}->value()['value2'])) {
+          $end = $wr_entity->{$date_field}->value()['value2'];
         }
         break;
     }
 
-    $event_array = array(
-      'id' => $event->id,
-      'title' => $event->title,
+    $entity_array = array(
+      'id' => $wr_entity->getIdentifier(),
+      'title' => $entity->title,
       'start' => date('c', $start),
     );
     if (!empty($end)) {
-      $event_array['end'] = date('c', $end);
+      $entity_array['end'] = date('c', $end);
     }
-    $settings['events'][] = $event_array;
+
+    $settings['events'][] = $entity_array;
   }
 
   // At this point validation is complete. 

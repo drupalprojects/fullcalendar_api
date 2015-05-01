@@ -9,10 +9,17 @@
  * Implements hook_menu().
  */
 function fullcalendar_api_example_menu() {
-  $items['fullcalendar'] = array(
+  $items['fullcalendar/calendar'] = array(
     'title' => 'FullCalendar',
     'description' => 'FullCalendar basic implementation.',
     'page callback' => 'fullcalendar_api_example_calendar_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['fullcalendar/entity'] = array(
+    'title' => 'FullCalendar Entities',
+    'description' => 'FullCalendar entity implementation.',
+    'page callback' => 'fullcalendar_api_example_entity_page',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -20,7 +27,7 @@ function fullcalendar_api_example_menu() {
 }
 
 /**
- * Page callback for /fullcalendar.
+ * Page callback for /fullcalendar/calendar.
  */
 function fullcalendar_api_example_calendar_page() {
 
@@ -93,4 +100,36 @@ function fullcalendar_api_example_calendar_page() {
     );
 
   return theme('fullcalendar_calendar', array('calendar_settings' => $settings));
+}
+
+/**
+ * Page callback for /fullcalendar/entity.
+ */
+function fullcalendar_api_example_entity_page() {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'article');
+  $result = $query->execute();
+  if (isset($result['node'])) {
+    $entity_ids = array_keys($result['node']);
+    $entities = entity_load('node', $entity_ids);
+
+    // Array of custom calendar settings. These override the defaults set 
+    // in the theme function.
+    $custom_settings = array(
+      'header' => array(
+        'left' => 'month,agendaWeek',
+        'right' => 'prev title next',
+      ),
+      'weekends' => TRUE,
+      'firstDay' => 1,
+    );
+
+    return theme('fullcalendar_calendar_entity', array(
+      'entities' => $entities,
+      'date_field' => 'field_date',
+      'calendar_settings' => $custom_settings,
+    ));
+  }
+  return array('#markup' => 'Calendar not available');
 }

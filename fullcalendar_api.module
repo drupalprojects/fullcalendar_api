@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Functions and hooks for FullCalendar API module.
+ */
+
+/**
+ * Implements hook_libraries_info().
+ */
+function fullcalendar_api_libraries_info() {
+  $libraries['fullcalendar'] = array(
+    'name' => 'Full Calendar',
+    'vendor url' => 'http://fullcalendar.io/',
+    'download url' => 'http://fullcalendar.io/download/',
+    'version arguments' => array(
+      'file' => 'fullcalendar.min.js',
+      'pattern' => '/FullCalendar v(\d+\.+\d+)/',
+      'lines' => 2,
+    ),
+    'files' => array(
+      'js' => array(
+        'lib/moment.min.js',
+        'fullcalendar.min.js',
+      ),
+      'css' => array(
+        'fullcalendar.min.css',
+      ),
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function fullcalendar_api_theme($existing, $type, $theme, $path) {
+  return array(
+    'fullcalendar_calendar' => array(
+      'file' => 'theme.inc',
+      'variables' => array(
+        'events' => array(NULL),
+        'date_field' => NULL,
+        'calendar_settings' => array(NULL),
+      ),
+    ),
+  );
+}

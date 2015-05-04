@@ -45,12 +45,26 @@ function fullcalendar_api_update($action, $id) {
   // format. Test with a non timestamp format to confirm.
   $date_value = $wr_entity->{$date_field}->value();
 
-  $date_value['value'] = $start_time;
-  if (empty($end_time)) {
-    $date_value['value2'] = $start_time;
+  if ($date_value['date_type'] == 'datestamp') {
+    $date_value['value'] = $start_time;
+    if (empty($end_time)) {
+      $date_value['value2'] = $start_time;
+    }
+    else {
+      $date_value['value2'] = $end_time;
+    }
   }
   else {
-    $date_value['value2'] = $end_time;
+    // Get date format and use php date() function.
+    // @todo timezone?
+    $format_string = date_type_format($date_value['date_type']);
+    $date_value['value'] = date($format_string, $start_time);
+    if (empty($end_time)) {
+      $date_value['value2'] = date($format_string, $start_time);
+    }
+    else {
+      $date_value['value2'] = date($format_string, $end_time);
+    }
   }
   $wr_entity->{$date_field}->set($date_value);
   

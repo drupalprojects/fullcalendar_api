@@ -6,6 +6,63 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function fullcalendar_api_menu() {
+  $items['fullcalendar-api/ajax/update/%/%'] = array(
+    'title' => 'Update entity',
+    'description' => 'Save the updated entity date.',
+    'page callback' => 'fullcalendar_api_update',
+    'page arguments' => array(3, 4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Saves the updated FullCalendar event's datetime.
+ */
+function fullcalendar_api_update($action, $id) {
+  if (empty($_POST['id'])) {
+    return;
+  }
+
+  // Retrieve and sanitize POST data.
+  $id = check_plain($_POST['id']);
+  $title = check_plain($_POST['title']);
+  $entity_type = check_plain($_POST['entityType']);
+  $bundle = check_plain($_POST['bundle']);
+  $all_day = $_POST['allDay'] ? TRUE : FALSE;
+  $date_field = check_plain($_POST['dateField']);
+  $start_time = intval($_POST['startTime']);
+  $end_time = $_POST['endTime'] ? intval($_POST['endTime']) : NULL;
+
+  $entity = entity_load_single($entity_type, $id);
+  $wr_entity = entity_metadata_wrapper($entity_type, $entity);
+
+  // possibly the entity wrapper setter method will convert to the right 
+  // format. Test with a non timestamp format to confirm.
+  $date_value = $wr_entity->{$date_field}->value();
+
+  $date_value['value'] = $start_time;
+  if (empty($end_time)) {
+    $date_value['value2'] = $start_time;
+  }
+  else {
+    $date_value['value2'] = $end_time;
+  }
+  $wr_entity->{$date_field}->set($date_value);
+  
+  if ($wr_entity->save()) {
+    drupal_json_output('success');
+  }
+  else {
+    drupal_json_output('failure');
+  }
+}
+
+/**
  * Implements hook_libraries_info().
  */
 function fullcalendar_api_libraries_info() {

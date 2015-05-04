@@ -23,6 +23,10 @@ function fullcalendar_api_example_menu() {
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
+  $items['fullcalendar/callbacks'] = array(
+    'title' => 'FullCalendar Callbacks',
+    'description' => 'Example of using callbacks when a FullCalendar event fires.',
+  );
   return $items;
 }
 
@@ -123,6 +127,7 @@ function fullcalendar_api_example_entity_page() {
       ),
       'weekends' => TRUE,
       'firstDay' => 1,
+      'defaultDate' => '2015-04-01',
     );
 
     return theme('fullcalendar_calendar_entity', array(

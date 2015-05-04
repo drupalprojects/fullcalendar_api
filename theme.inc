@@ -25,6 +25,9 @@ function theme_fullcalendar_calendar($vars) {
     'businessHours' => TRUE,
     'editable' => TRUE,
     'events' => array(),
+    // 'eventDrop' => 'function( event, delta, revertFunc, jsEvent, ui, view ) {
+    //   console.log(event ); 
+    // }',
   );
 
   // Override defaults with user submitted data.
@@ -100,7 +103,10 @@ function theme_fullcalendar_calendar_entity($vars) {
 
     $entity_array = array(
       'id' => $wr_entity->getIdentifier(),
-      'title' => $entity->title,
+      'entityType' => 'node', // @todo generalize this
+      'bundle' => $wr_entity->type->value(),
+      'title' => $wr_entity->title->value(),
+      'dateField' => $date_field,
       'start' => date('c', $start),
     );
     if (!empty($end)) {

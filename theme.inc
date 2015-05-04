@@ -67,13 +67,30 @@ function theme_fullcalendar_calendar_entity($vars) {
     throw new Exception(t('Field name %field_name is not a valid date field.', array('%field_name' => $date_field)));
   }
 
-  foreach ($entities as $entity) {
+  // Get entity_type -> bundle mappings so we can have mixed entity types 
+  // in our calendar events.
+  $entity_info = entity_get_info();
+  $entity_bundle_types = array();
+  foreach ($entity_info as $entity_type => $data) {
+    foreach (array_keys($data['bundles']) as $bundle) {
+      $entity_bundle_types[$bundle] = $entity_type;
+    }
+  }
 
-    $wr_entity = entity_metadata_wrapper('node', $entity);
+  foreach ($entities as $entity) {
+    // If "bundle" is not defined, use "type".
+    $entity_type = NULL;
+    if (!isset($entity->bundle)) {
+      $entity_type = $entity_bundle_types[$entity->type];
+    }
+    else {
+      $entity_type = $entity_bundle_types[$entity->bundle];
+    }
+
+    $wr_entity = entity_metadata_wrapper($entity_type, $entity);
 
     $start = NULL;
     $end = NULL;
-
     // If the date type is not "datestamp" (timestamp), pass the string to 
     // DateTime constructor. It will automatically detect the date format and 
     // give us a timestamp.
@@ -83,7 +100,6 @@ function theme_fullcalendar_calendar_entity($vars) {
         // @todo timezone?
         $dateTime = new DateTime($wr_entity->{$date_field}->value()['value']);
         $start = $dateTime->getTimestamp();
-
         // if end date
         if (!empty($wr_entity->{$date_field}->value()['value2'])) {
           // @todo timezone?
@@ -103,7 +119,7 @@ function theme_fullcalendar_calendar_entity($vars) {
 
     $entity_array = array(
       'id' => $wr_entity->getIdentifier(),
-      'entityType' => 'node', // @todo generalize this
+      'entityType' => $entity_type,
       'bundle' => $wr_entity->type->value(),
       'title' => $wr_entity->title->value(),
       'dateField' => $date_field,

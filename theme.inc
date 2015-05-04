@@ -94,25 +94,27 @@ function theme_fullcalendar_calendar_entity($vars) {
     // If the date type is not "datestamp" (timestamp), pass the string to 
     // DateTime constructor. It will automatically detect the date format and 
     // give us a timestamp.
-    switch ($wr_entity->{$date_field}->value()['date_type']) {
+    $date_field_value = $wr_entity->{$date_field}->value();
+    $date_type = $date_field_value['date_type'];
+    switch ($date_type) {
       case 'date':
       case 'datetime':
         // @todo timezone?
-        $dateTime = new DateTime($wr_entity->{$date_field}->value()['value']);
+        $dateTime = new DateTime($date_field_value['value']);
         $start = $dateTime->getTimestamp();
         // if end date
-        if (!empty($wr_entity->{$date_field}->value()['value2'])) {
+        if (!empty($date_field_value['value2'])) {
           // @todo timezone?
-          $endDateTime = new DateTime($wr_entity->{$date_field}->value()['value2']);
+          $endDateTime = new DateTime($date_field_value['value2']);
           $end = $endDateTime->getTimestamp();
         }
         break;
       case 'datestamp':
         // Date value is already a timestamp.
-        $start = $wr_entity->{$date_field}->value()['value'];
+        $start = $date_field_value['value'];
         // if end date
-        if (!empty($wr_entity->{$date_field}->value()['value2'])) {
-          $end = $wr_entity->{$date_field}->value()['value2'];
+        if (!empty($date_field_value['value2'])) {
+          $end = $date_field_value['value2'];
         }
         break;
     }

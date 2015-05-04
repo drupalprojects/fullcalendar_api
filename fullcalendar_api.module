@@ -24,19 +24,19 @@ function fullcalendar_api_menu() {
  * Saves the updated FullCalendar event's datetime.
  */
 function fullcalendar_api_update($action, $id) {
-  if (empty($_POST['id'])) {
+  if (empty($_REQUEST['id'])) {
     return;
   }
 
   // Retrieve and sanitize POST data.
-  $id = check_plain($_POST['id']);
-  $title = check_plain($_POST['title']);
-  $entity_type = check_plain($_POST['entityType']);
-  $bundle = check_plain($_POST['bundle']);
-  $all_day = $_POST['allDay'] ? TRUE : FALSE;
-  $date_field = check_plain($_POST['dateField']);
-  $start_time = intval($_POST['startTime']);
-  $end_time = $_POST['endTime'] ? intval($_POST['endTime']) : NULL;
+  $id = check_plain($_REQUEST['id']);
+  $title = check_plain($_REQUEST['title']);
+  $entity_type = check_plain($_REQUEST['entityType']);
+  $bundle = check_plain($_REQUEST['bundle']);
+  $all_day = $_REQUEST['allDay'] ? TRUE : FALSE;
+  $date_field = check_plain($_REQUEST['dateField']);
+  $start_time = intval($_REQUEST['startTime']);
+  $end_time = $_REQUEST['endTime'] ? intval($_REQUEST['endTime']) : NULL;
 
   $entity = entity_load_single($entity_type, $id);
   $wr_entity = entity_metadata_wrapper($entity_type, $entity);

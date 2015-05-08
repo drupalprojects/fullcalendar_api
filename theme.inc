@@ -25,9 +25,6 @@ function theme_fullcalendar_calendar($vars) {
     'businessHours' => TRUE,
     'editable' => TRUE,
     'events' => array(),
-    // 'eventDrop' => 'function( event, delta, revertFunc, jsEvent, ui, view ) {
-    //   console.log(event ); 
-    // }',
   );
 
   // Override defaults with user submitted data.

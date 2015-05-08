@@ -1,6 +1,7 @@
 name = FullCalendar API
 description = API interface for jQuery FullCalendar plugin, http://fullcalendar.io/.
 core = 7.x
+package = FullCalendar API
 dependencies[] = date
 dependencies[] = entity
 dependencies[] = jquery_update

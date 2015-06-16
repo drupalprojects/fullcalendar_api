@@ -78,7 +78,10 @@ function fullcalendar_api_example_calendar_page() {
       )
     );
 
-  return theme('fullcalendar_calendar', array('calendar_settings' => $settings));
+  return theme('fullcalendar_calendar', array(
+    'calendar_id' => 'fullcalendar',
+    'calendar_settings' => $settings,
+  ));
 }
 
 /**
@@ -107,7 +110,8 @@ function fullcalendar_api_example_entity_page() {
 
     return theme('fullcalendar_calendar_entity', array(
       'entities' => $entities,
-      'date_field' => 'field_date',
+      'date_field_map' => array('article' => 'field_date'),
+      'calendar_id' => 'fullcalendar-entity',
       'calendar_settings' => $custom_settings,
     ));
   }

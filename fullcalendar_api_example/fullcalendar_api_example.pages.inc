@@ -122,3 +122,45 @@ function fullcalendar_api_example_entity_page() {
       '<li>Visit this page again.</li>',
   );
 }
+
+/**
+ * Page callback for /fullcalendar/callbacks.
+ */
+function fullcalendar_api_example_callbacks_page() {
+  $build = array();
+
+  // Array of FullCalendar settings.
+  $settings = array(
+    'header' => array(
+      'left' => 'prev,next today',
+      'center' => 'title',
+      'right' => 'month,agendaWeek,agendaDay',
+    ),
+    'defaultDate' => '2015-02-12',
+    'editable' => TRUE,
+    'eventLimit' => TRUE, // allow "more" link when too many events
+    'events' => array(
+      array(
+        'title' => 'All Day Event',
+        'start' => '2015-02-01',
+      ),
+      array(
+        'title' => 'Long Event',
+        'start' => '2015-02-07',
+        'end' => '2015-02-10',
+      ),
+      array(
+        'title' => 'Conference',
+        'start' => '2015-02-11',
+        'end' => '2015-02-13',
+      ),
+    )
+  );
+  // Here we add our custom javascript file which will implement FullCalendar's callbacks.
+  drupal_add_js(drupal_get_path('module', 'fullcalendar_api_example') . '/fullcalendar-example-custom-callbacks.js');
+  $build['calendar'] = theme('fullcalendar_calendar', array(
+    'calendar_id' => 'fullcalendar',
+    'calendar_settings' => $settings,
+  ));
+  return $build;
+}

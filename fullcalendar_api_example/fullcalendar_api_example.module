@@ -28,6 +28,10 @@ function fullcalendar_api_example_menu() {
   $items['fullcalendar/callbacks'] = array(
     'title' => 'FullCalendar Callbacks',
     'description' => 'Example of using callbacks when a FullCalendar event fires.',
+    'page callback' => 'fullcalendar_api_example_callbacks_page',
+    'access callback' => TRUE,
+    'file' => 'fullcalendar_api_example.pages.inc',
+    'type' => MENU_CALLBACK,
   );
   return $items;
 }

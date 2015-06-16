@@ -105,7 +105,7 @@ function fullcalendar_api_example_entity_page() {
       ),
       'weekends' => TRUE,
       'firstDay' => 1,
-      'defaultDate' => '2015-04-01',
+      'defaultDate' => date('Y-m-d'),
     );
 
     return theme('fullcalendar_calendar_entity', array(
@@ -115,5 +115,10 @@ function fullcalendar_api_example_entity_page() {
       'calendar_settings' => $custom_settings,
     ));
   }
-  return array('#markup' => 'Calendar not available');
+  return array(
+    '#markup' => '<p>Calendar not available.</p>' .
+      '<ol><li>Add a required field called <em>field_date</em> to the Article content type.</li>' . 
+      '<li>Add some content.</li>' .
+      '<li>Visit this page again.</li>',
+  );
 }

@@ -124,12 +124,14 @@ function fullcalendar_api_theme($existing, $type, $theme, $path) {
   return array(
     'fullcalendar_calendar' => array(
       'file' => 'theme.inc',
+      'path' => "$path/theme",
       'variables' => array(
         'calendar_settings' => array(NULL),
       ),
     ),
     'fullcalendar_calendar_entity' => array(
       'file' => 'theme.inc',
+      'path' => "$path/theme",
       'variables' => array(
         'entities' => array(NULL),
         'date_field_map' => array(NULL),
@@ -143,11 +145,13 @@ function fullcalendar_api_theme($existing, $type, $theme, $path) {
 /**
  * Helper function to load all scripts necessary to embed FullCalendar.
  */
-function fullcalendar_api_load_calendar($calendar_id, $settings) {
+function fullcalendar_api_load_calendar($calendar_id, $calendar_settings) {
   libraries_load('fullcalendar');
-  drupal_add_js(drupal_get_path('module', 'fullcalendar_api') . '/fullcalendar_calendar.js', array('scope' => 'footer'));
-  drupal_add_js(array('fullcalendar_api' => array(
-    'calendarId' => $calendar_id,
-    'calendarSettings' => $settings,
-  )), 'setting');
+  drupal_add_js(drupal_get_path('module', 'fullcalendar_api') . '/js/fullcalendar.load.js', array('scope' => 'footer'));
+  $js_settings = array(
+    'instances' => array(
+      $calendar_id => $calendar_settings,
+    ),
+  );
+  drupal_add_js(array('fullCalendarApi' => $js_settings), 'setting');
 }

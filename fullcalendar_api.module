@@ -39,19 +39,30 @@ function fullcalendar_api_update($action, $id) {
   $end_time = $_REQUEST['endTime'] ? intval($_REQUEST['endTime']) : NULL;
 
   $entity = entity_load_single($entity_type, $id);
-  $wr_entity = entity_metadata_wrapper($entity_type, $entity);
 
-  // possibly the entity wrapper setter method will convert to the right 
-  // format. Test with a non timestamp format to confirm.
-  $date_value = $wr_entity->{$date_field}->value();
+  // Directly assign the date value instead of using entity metadata wrappers 
+  // to support custom field type.
+  // @todo this could be a lot more flexible
+  $date_value = $entity->{$date_field}[LANGUAGE_NONE][0];
 
   if ($date_value['date_type'] == 'datestamp') {
     $date_value['value'] = $start_time;
     if (empty($end_time)) {
-      $date_value['value2'] = $start_time;
+      $date_value['value2'] = $date_value['value'];
     }
     else {
       $date_value['value2'] = $end_time;
+    }
+  }
+  elseif ($date_value['date_type'] == 'ep_datetime') {
+    $format_string = DATE_FORMAT_DATETIME;
+    $date_value['type'] = 'exact';
+    $date_value['value'] = date($format_string, $start_time);
+    if (empty($end_time)) {
+      $date_value['value2'] = $date_value['value'];
+    }
+    else {
+      $date_value['value2'] = date($format_string, $end_time);
     }
   }
   else {
@@ -60,15 +71,15 @@ function fullcalendar_api_update($action, $id) {
     $format_string = date_type_format($date_value['date_type']);
     $date_value['value'] = date($format_string, $start_time);
     if (empty($end_time)) {
-      $date_value['value2'] = date($format_string, $start_time);
+      $date_value['value2'] = $date_value['value'];
     }
     else {
       $date_value['value2'] = date($format_string, $end_time);
     }
   }
-  $wr_entity->{$date_field}->set($date_value);
+  $entity->{$date_field}[LANGUAGE_NONE][0] = $date_value;;
   
-  if ($wr_entity->save()) {
+  if (entity_save($entity_type, $entity)) {
     drupal_json_output('success');
   }
   else {
@@ -91,12 +102,16 @@ function fullcalendar_api_libraries_info() {
     ),
     'files' => array(
       'js' => array(
-        'lib/moment.min.js',
-        'fullcalendar.min.js',
+        'fullcalendar.min.js' => array(
+          'scope' => 'footer',
+        ),
       ),
       'css' => array(
         'fullcalendar.min.css',
       ),
+    ),
+    'dependencies' => array(
+      'moment',
     ),
   );
   return $libraries;
@@ -117,9 +132,22 @@ function fullcalendar_api_theme($existing, $type, $theme, $path) {
       'file' => 'theme.inc',
       'variables' => array(
         'entities' => array(NULL),
-        'date_field' => NULL,
+        'date_field_map' => array(NULL),
+        'calendar_id' => NULL,
         'calendar_settings' => array(NULL),
       ),
     ),
   );
+}
+
+/**
+ * Helper function to load all scripts necessary to embed FullCalendar.
+ */
+function fullcalendar_api_load_calendar($calendar_id, $settings) {
+  libraries_load('fullcalendar');
+  drupal_add_js(drupal_get_path('module', 'fullcalendar_api') . '/fullcalendar_calendar.js', array('scope' => 'footer'));
+  drupal_add_js(array('fullcalendar_api' => array(
+    'calendarId' => $calendar_id,
+    'calendarSettings' => $settings,
+  )), 'setting');
 }

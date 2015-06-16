@@ -10,13 +10,15 @@
  * @params
  *   events array of event objects
  *   date_field string field name of valid date field
+ *   calendar_id string the CSS id of the calendar DOM object
  *   calendar_settings array of settings to override FullCalendar.js defaults
  */
 function theme_fullcalendar_calendar($vars) {
+  $calendar_id = $vars['calendar_id'];
   $user_settings = $vars['calendar_settings'];
 
   // Default settings.
-  $settings = array(
+  $settings = array(  
     'header' => array(
       'left' => 'month,agendaWeek',
       'right' => 'prev title next',
@@ -30,13 +32,11 @@ function theme_fullcalendar_calendar($vars) {
   // Override defaults with user submitted data.
   $settings = array_replace_recursive($settings, $user_settings);
 
-  // Add fullcalendar scripts.
-  libraries_load('fullcalendar');
-  drupal_add_js(drupal_get_path('module', 'fullcalendar_api') . '/fullcalendar_calendar.js');
-  drupal_add_js(array('fullcalendar_api' => array('calendarSettings' => $settings)), 'setting');
+  // Add FullCalendar scripts.
+  fullcalendar_api_load_calendar($calendar_id, $settings);
 
   return array(
-    '#markup' => '<div id="fullcalendar"></div>',
+    '#markup' => '<div id="' . check_plain($calendar_id) . '"></div>',
   );
 }
 
@@ -48,20 +48,28 @@ function theme_fullcalendar_calendar($vars) {
  * @params
  *   entities array of event objects
  *   date_field string field name of valid date field
+ *   calendar_id string the CSS id of the calendar DOM object
  *   calendar_settings array of settings to override FullCalendar.js defaults
  */
 function theme_fullcalendar_calendar_entity($vars) {
   $entities = $vars['entities'];
-  $date_field = $vars['date_field'];
+  $date_field_map = $vars['date_field_map'];
+  $calendar_id = $vars['calendar_id'];
   $settings = $vars['calendar_settings'];
 
-  // Check if field is valid date type.
-  $date_field_info = field_info_field($date_field);
-  if (
-    !$date_field_info ||
-    !in_array($date_field_info['type'], array('date', 'datetime', 'datestamp'))
-  ) {
-    throw new Exception(t('Field name %field_name is not a valid date field.', array('%field_name' => $date_field)));
+  if (!array($date_field_map)) {
+    throw new Exception(t('Invalid parameter: Date field must be an array.'));
+  }
+
+  foreach ($date_field_map as $date_field) {
+    // Check if field is valid date type.
+    $date_field_info = field_info_field($date_field);
+    if (
+      !$date_field_info ||
+      !in_array($date_field_info['type'], array('date', 'datetime', 'datestamp', 'ep_datetime'))
+    ) {
+      throw new Exception(t('Field name %field_name is not a valid date field.', array('%field_name' => $date_field)));
+    }
   }
 
   // Get entity_type -> bundle mappings so we can have mixed entity types 
@@ -76,26 +84,23 @@ function theme_fullcalendar_calendar_entity($vars) {
 
   foreach ($entities as $entity) {
     // If "bundle" is not defined, use "type".
-    $entity_type = NULL;
     if (!isset($entity->bundle)) {
-      $entity_type = $entity_bundle_types[$entity->type];
+      $entity->bundle = $entity->type;
     }
-    else {
-      $entity_type = $entity_bundle_types[$entity->bundle];
-    }
-
-    $wr_entity = entity_metadata_wrapper($entity_type, $entity);
+    $entity_type = $entity_bundle_types[$entity->bundle];
+    $date_field = $date_field_map[$entity->bundle];
 
     $start = NULL;
     $end = NULL;
     // If the date type is not "datestamp" (timestamp), pass the string to 
     // DateTime constructor. It will automatically detect the date format and 
     // give us a timestamp.
-    $date_field_value = $wr_entity->{$date_field}->value();
+    $date_field_value = $entity->{$date_field}[LANGUAGE_NONE][0];
     $date_type = $date_field_value['date_type'];
     switch ($date_type) {
       case 'date':
       case 'datetime':
+      case 'ep_datetime':
         // @todo timezone?
         $dateTime = new DateTime($date_field_value['value']);
         $start = $dateTime->getTimestamp();
@@ -116,13 +121,18 @@ function theme_fullcalendar_calendar_entity($vars) {
         break;
     }
 
+    list($entity_id,,) = entity_extract_ids($entity_type, $entity);
+
     $entity_array = array(
-      'id' => $wr_entity->getIdentifier(),
+      'id' => $entity_id,
       'entityType' => $entity_type,
-      'bundle' => $wr_entity->type->value(),
-      'title' => $wr_entity->title->value(),
+      'bundle' => $entity->bundle,
+      'title' => $entity->title,
       'dateField' => $date_field,
       'start' => date('c', $start),
+      'className' => array(
+        'event-' . $entity_type . '-' . $entity->type,
+      ),
     );
     if (!empty($end)) {
       $entity_array['end'] = date('c', $end);
@@ -130,9 +140,11 @@ function theme_fullcalendar_calendar_entity($vars) {
 
     $settings['events'][] = $entity_array;
   }
-
   // At this point validation is complete. 
   // Pass the settings data to the theme_fullcalendar_calendar function.
 
-  return theme('fullcalendar_calendar', array('calendar_settings' => $settings));
+  return theme('fullcalendar_calendar', array(
+    'calendar_id' => $calendar_id,
+    'calendar_settings' => $settings,
+  ));
 }

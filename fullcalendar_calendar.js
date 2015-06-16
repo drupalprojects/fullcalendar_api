@@ -6,11 +6,15 @@
 (function($) {
   Drupal.behaviors.fullCalendarApiCalendar = {
     attach: function(context, settings) {
-
-      var $calendar = $('#fullcalendar');
-      if (!$calendar.length || !settings.fullcalendar_api.calendarSettings) {
+      if (!settings.fullcalendar_api.calendarSettings) {
         return;
       }
+      var $calendarId = settings.fullcalendar_api.calendarId;
+      var $calendar = $('#' + $calendarId, context);
+      if (!$calendar.length) {
+        return;
+      }
+
       var $settings = settings.fullcalendar_api.calendarSettings;
       // Merge in event callbacks.
       $.extend($settings, {
@@ -47,6 +51,22 @@
 
         }
       });
+
+      // Use the hash parameters, if they exist. Hash is of the form:
+      //   <viewName>/<ISO-date>
+      //   Ex. month/2015-06
+      var origHash = window.location.hash;
+      if (origHash.length > 1) {
+        var params = origHash.substring(1).split('/');
+        // @todo validate
+        $.extend($settings, {
+          defaultView: params[0],
+          defaultDate: params[1]
+        });
+      }
+
+      // Run any custom actions before attaching the calendar.
+      $(document, context).trigger('fullCalendarApiCalendar.preprocess', [$calendar, $settings]);
       
       $calendar.fullCalendar($settings);
     } 

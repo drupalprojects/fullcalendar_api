@@ -32,12 +32,16 @@ function theme_fullcalendar_calendar($vars) {
   // Override defaults with user submitted data.
   $settings = array_replace_recursive($settings, $user_settings);
 
+  // Have to make sure that html id and id in settings are identical.
+  $calendar_id = drupal_html_id($calendar_id);
+
   // Add FullCalendar scripts.
   fullcalendar_api_load_calendar($calendar_id, $settings);
 
   return array(
-    '#markup' => '<div id="' . check_plain($calendar_id) . '"></div>',
+    '#markup' => '<div id="' . $calendar_id . '"></div>',
   );
+}
 }
 
 

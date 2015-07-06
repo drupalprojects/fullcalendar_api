@@ -50,7 +50,6 @@
             url: '//' + window.location.hostname +  settings.basePath + settings.pathPrefix + 'fullcalendar-api/ajax/update/drop/' + event.id,
             data: dataObj
           }).done(function(response) {
-            console.log(response);
             // @todo return success?
             if (response == 'failure') {
               revertFunc();

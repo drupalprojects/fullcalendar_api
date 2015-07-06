@@ -85,6 +85,15 @@ function fullcalendar_api_example_calendar_page() {
 }
 
 /**
+ * Page callback for /fullcalendar/datasource.
+ */
+function fullcalendar_api_example_datasource_page() {
+  return array(
+    '#markup' => '<p>Calendar not available.</p>',
+  );
+}
+
+/**
  * Page callback for /fullcalendar/entity.
  */
 function fullcalendar_api_example_entity_page() {

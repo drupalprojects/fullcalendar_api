@@ -124,6 +124,15 @@ function fullcalendar_api_theme($existing, $type, $theme, $path) {
         'calendar_settings' => array(NULL),
       ),
     ),
+    'fullcalendar_calendar_datasource' => array(
+      'file' => 'theme.inc',
+      'path' => "$path/theme",
+      'variables' => array(
+        'datasource_uri' => NULL,
+        'calendar_id' => NULL,
+        'calendar_settings' => array(NULL),
+      ),
+    ),
     'fullcalendar_calendar_entity' => array(
       'file' => 'theme.inc',
       'path' => "$path/theme",

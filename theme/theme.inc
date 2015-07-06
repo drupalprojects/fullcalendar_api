@@ -42,8 +42,30 @@ function theme_fullcalendar_calendar($vars) {
     '#markup' => '<div id="' . $calendar_id . '"></div>',
   );
 }
-}
 
+/**
+ * Theme function for fullcalendar_calendar_datasource.
+ * Renders a calendar using passed in datasource URL. This datasource should 
+ * be a JSON feed set up externally.
+ * 
+ * @params
+ *   datasource_uri string the path of the JSON data feed
+ *   calendar_id string the CSS id of the calendar DOM object
+ *   calendar_settings array of settings to override FullCalendar.js defaults
+ */
+function theme_fullcalendar_calendar_datasource($vars) {
+  $datasource_uri = $vars['datasource_uri'];
+  $calendar_id = $vars['calendar_id'];
+  $settings = $vars['calendar_settings'];
+
+  $full_url = url($datasource_uri, array('absolute' => TRUE));
+  $settings['events'] = $full_url;
+
+  return theme('fullcalendar_calendar', array(
+    'calendar_id' => $calendar_id,
+    'calendar_settings' => $settings,
+  ));
+}
 
 /**
  * Theme function for fullcalendar_calendar_entity.

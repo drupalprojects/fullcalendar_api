@@ -160,6 +160,13 @@ function theme_fullcalendar_calendar_entity($vars) {
         'event-' . $entity_type . '-' . $entity->type,
       ),
     );
+    // If className has been passed in, append.
+    if (!empty($entity->className)) {
+      if (!is_array($entity->className)) {
+        $entity->className = array($entity->className);
+      }
+      $entity_array['className'] = array_merge($entity_array['className'], $entity->className);
+    }
     if (!empty($end)) {
       $entity_array['end'] = date('c', $end);
     }

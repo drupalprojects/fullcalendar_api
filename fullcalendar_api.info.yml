@@ -3,10 +3,7 @@ description: 'API interface for jQuery FullCalendar plugin, http://fullcalendar.
 core: 8.x
 package: Calendar
 dependencies:
-  - date
-  - date_api
-  - entity
-  - jquery_update
+  - datetime
   - libraries
   - moment
 project: fullcalendar_api

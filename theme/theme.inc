@@ -33,7 +33,7 @@ function theme_fullcalendar_calendar($vars) {
   $settings = array_replace_recursive($settings, $user_settings);
 
   // Have to make sure that html id and id in settings are identical.
-  $calendar_id = drupal_html_id($calendar_id);
+  $calendar_id = \Drupal\Component\Utility\Html::getId($calendar_id);
 
   // Add FullCalendar scripts.
   fullcalendar_api_load_calendar($calendar_id, $settings);
@@ -58,10 +58,13 @@ function theme_fullcalendar_calendar_datasource($vars) {
   $calendar_id = $vars['calendar_id'];
   $settings = $vars['calendar_settings'];
 
-  $full_url = url($datasource_uri, array('absolute' => TRUE));
+  // @FIXME
+// url() expects a route name or an external URI.
+// $full_url = url($datasource_uri, array('absolute' => TRUE));
+
   $settings['events'] = $full_url;
 
-  return theme('fullcalendar_calendar', array(
+  return _theme('fullcalendar_calendar', array(
     'calendar_id' => $calendar_id,
     'calendar_settings' => $settings,
   ));
@@ -100,7 +103,7 @@ function theme_fullcalendar_calendar_entity($vars) {
 
   // Get entity_type -> bundle mappings so we can have mixed entity types 
   // in our calendar events.
-  $entity_info = entity_get_info();
+  $entity_info = \Drupal::entityManager()->getDefinitions();
   $entity_bundle_types = array();
   foreach ($entity_info as $entity_type => $data) {
     foreach (array_keys($data['bundles']) as $bundle) {
@@ -121,7 +124,7 @@ function theme_fullcalendar_calendar_entity($vars) {
     // If the date type is not "datestamp" (timestamp), pass the string to 
     // DateTime constructor. It will automatically detect the date format and 
     // give us a timestamp.
-    $date_field_value = $entity->{$date_field}[LANGUAGE_NONE][0];
+    $date_field_value = $entity->{$date_field}[\Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED][0];
     $date_type = $date_field_value['date_type'];
     switch ($date_type) {
       case 'date':
@@ -176,7 +179,7 @@ function theme_fullcalendar_calendar_entity($vars) {
   // At this point validation is complete. 
   // Pass the settings data to the theme_fullcalendar_calendar function.
 
-  return theme('fullcalendar_calendar', array(
+  return _theme('fullcalendar_calendar', array(
     'calendar_id' => $calendar_id,
     'calendar_settings' => $settings,
   ));

@@ -43,7 +43,7 @@ function fullcalendar_api_update($action, $id) {
   // Directly assign the date value instead of using entity metadata wrappers 
   // to support custom field type.
   // @todo this could be a lot more flexible
-  $date_value = $entity->{$date_field}[LANGUAGE_NONE][0];
+  $date_value = $entity->{$date_field}[\Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED][0];
 
   $format_string = DATE_FORMAT_DATETIME;
   switch ($date_value['date_type']) {
@@ -74,11 +74,11 @@ function fullcalendar_api_update($action, $id) {
     }
   }
 
-  $entity->{$date_field}[LANGUAGE_NONE][0] = $date_value;
+  $entity->{$date_field}[\Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED][0] = $date_value;
 
   // entity_save() will throw an error if it did not successfully save, 
   // which will prevent 'success' from being returned.
-  entity_save($entity_type, $entity);
+  $entity->save();
   drupal_json_output('success');
 }
 
@@ -151,11 +151,27 @@ function fullcalendar_api_theme($existing, $type, $theme, $path) {
  */
 function fullcalendar_api_load_calendar($calendar_id, $calendar_settings) {
   libraries_load('fullcalendar');
-  drupal_add_js(drupal_get_path('module', 'fullcalendar_api') . '/js/fullcalendar.load.js', array('scope' => 'footer'));
+  // @FIXME
+// CSS, JavaScript, and libraries are now attached directly to render arrays
+// using the #attached property. drupal_add_js() is internal and should never be
+// called directly.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// drupal_add_js(drupal_get_path('module', 'fullcalendar_api') . '/js/fullcalendar.load.js', array('scope' => 'footer'));
+
   $js_settings = array(
     'instances' => array(
       $calendar_id => $calendar_settings,
     ),
   );
-  drupal_add_js(array('fullCalendarApi' => $js_settings), 'setting');
+  // @FIXME
+// CSS, JavaScript, and libraries are now attached directly to render arrays
+// using the #attached property. drupal_add_js() is internal and should never be
+// called directly.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// drupal_add_js(array('fullCalendarApi' => $js_settings), 'setting');
+
 }

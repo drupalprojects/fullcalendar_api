@@ -1,5 +1,0 @@
-name = FullCalendar API Examples
-description = Examples for using FullCalendar API module.
-core = 7.x
-package = Calendar
-requirements[] = fullcalendar_api

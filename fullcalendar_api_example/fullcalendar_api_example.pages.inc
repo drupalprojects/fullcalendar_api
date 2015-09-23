@@ -78,7 +78,7 @@ function fullcalendar_api_example_calendar_page() {
       )
     );
 
-  return theme('fullcalendar_calendar', array(
+  return _theme('fullcalendar_calendar', array(
     'calendar_id' => 'fullcalendar',
     'calendar_settings' => $settings,
   ));
@@ -100,7 +100,7 @@ function fullcalendar_api_example_datasource_page() {
   );
   // @see fullcalendar_api_example.ajax.inc.
   $datasource_uri = 'fullcalendar/json-data';
-  return theme('fullcalendar_calendar_datasource', array(
+  return _theme('fullcalendar_calendar_datasource', array(
     'calendar_id' => 'fullcalendar',
     'calendar_settings' => $settings,
     'datasource_uri' => $datasource_uri,
@@ -117,7 +117,7 @@ function fullcalendar_api_example_entity_page() {
   $result = $query->execute();
   if (isset($result['node'])) {
     $entity_ids = array_keys($result['node']);
-    $entities = entity_load('node', $entity_ids);
+    $entities = \Drupal::entityManager()->getStorage('node');
 
     // Array of custom calendar settings. These override the defaults set 
     // in the theme function.
@@ -131,7 +131,7 @@ function fullcalendar_api_example_entity_page() {
       'defaultDate' => date('Y-m-d'),
     );
 
-    return theme('fullcalendar_calendar_entity', array(
+    return _theme('fullcalendar_calendar_entity', array(
       'entities' => $entities,
       'date_field_map' => array('article' => 'field_date'),
       'calendar_id' => 'fullcalendar-entity',
@@ -180,8 +180,16 @@ function fullcalendar_api_example_callbacks_page() {
     )
   );
   // Here we add our custom javascript file which will implement FullCalendar's callbacks.
-  drupal_add_js(drupal_get_path('module', 'fullcalendar_api_example') . '/fullcalendar-example-custom-callbacks.js');
-  $build['calendar'] = theme('fullcalendar_calendar', array(
+  // @FIXME
+// CSS, JavaScript, and libraries are now attached directly to render arrays
+// using the #attached property. drupal_add_js() is internal and should never be
+// called directly.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// drupal_add_js(drupal_get_path('module', 'fullcalendar_api_example') . '/fullcalendar-example-custom-callbacks.js');
+
+  $build['calendar'] = _theme('fullcalendar_calendar', array(
     'calendar_id' => 'fullcalendar',
     'calendar_settings' => $settings,
   ));

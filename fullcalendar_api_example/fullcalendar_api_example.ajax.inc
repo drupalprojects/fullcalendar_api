@@ -65,6 +65,6 @@ function full_calendar_api_example_data_provider() {
       'start' => '2015-02-28',
     ),
   );
-  echo drupal_json_encode($events);
+  echo \Drupal\Component\Serialization\Json::encode($events);
   drupal_exit();
 }

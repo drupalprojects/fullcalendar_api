@@ -109,6 +109,19 @@ function fullcalendar_api_libraries_info() {
       'moment',
     ),
   );
+
+  $libraries['moment'] = array(
+    'name' => 'Moment.js',
+    'vendor url' => 'http://momentjs.com',
+    'download url' => 'https://github.com/moment/moment/releases',
+    'version arguments' => array(),
+    'files' => array(
+      'js' => array(
+        'min/moment.min.js',
+      ),
+    ),
+  );
+
   return $libraries;
 }
 

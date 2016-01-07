@@ -5,45 +5,6 @@
  */
 
 /**
- * Theme function for fullcalendar_calendar.
- *
- * @params
- *   events array of event objects
- *   date_field string field name of valid date field
- *   calendar_id string the CSS id of the calendar DOM object
- *   calendar_settings array of settings to override FullCalendar.js defaults
- */
-function theme_fullcalendar_calendar($vars) {
-  $calendar_id = $vars['calendar_id'];
-  $user_settings = $vars['calendar_settings'];
-
-  // Default settings.
-  $settings = array(  
-    'header' => array(
-      'left' => 'month,agendaWeek',
-      'right' => 'prev title next',
-    ),
-    'defaultDate' => date('Y-m-d'),
-    'businessHours' => TRUE,
-    'editable' => TRUE,
-    'events' => array(),
-  );
-
-  // Override defaults with user submitted data.
-  $settings = array_replace_recursive($settings, $user_settings);
-
-  // Have to make sure that html id and id in settings are identical.
-  $calendar_id = \Drupal\Component\Utility\Html::getId($calendar_id);
-
-  // Add FullCalendar scripts.
-  fullcalendar_api_load_calendar($calendar_id, $settings);
-
-  return array(
-    '#markup' => '<div id="' . $calendar_id . '"></div>',
-  );
-}
-
-/**
  * Theme function for fullcalendar_calendar_datasource.
  * Renders a calendar using passed in datasource URL. This datasource should 
  * be a JSON feed set up externally.

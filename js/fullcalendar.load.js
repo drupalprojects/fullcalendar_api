@@ -5,14 +5,14 @@
 
 (function($) {
   Drupal.behaviors.fullCalendarApi = {
-    attach: function(context, settings) {
+    attach: function(context, drupalSettings) {
 
-      if ($.type(settings.fullCalendarApi) == 'undefined' || $.type(settings.fullCalendarApi.instances) == 'undefined') {
+      if ($.type(drupalSettings.fullcalendar_api) == 'undefined' || $.type(drupalSettings.fullcalendar_api.instances) == 'undefined') {
         return false;
       }
 
-      for (id in settings.fullCalendarApi.instances) {
-        _fullCalendarApiInit(id, settings.fullCalendarApi.instances[id], context, settings);
+      for (id in drupalSettings.fullcalendar_api.instances) {
+        _fullCalendarApiInit(id, drupalSettings.fullcalendar_api.instances[id], context, drupalSettings);
       }
 
     }
@@ -21,7 +21,7 @@
   /**
    * Initialize the FullCalendar instance.
    */
-  function _fullCalendarApiInit(id, calendarSettings, context, settings) {
+  function _fullCalendarApiInit(id, calendarSettings, context, drupalSettings) {
     calendar = $('#' + id, context);
 
     // Merge in event callbacks.
@@ -47,7 +47,7 @@
           // Save the entity via AJAX.
           $.ajax({
             method: 'POST',
-            url: '//' + window.location.hostname +  settings.basePath + settings.pathPrefix + 'fullcalendar-api/ajax/update/drop/' + event.id,
+            url: '//' + window.location.hostname +  drupalSettings.path.baseUrl + drupalSettings.path.pathPrefix + 'fullcalendar-api/ajax/update/drop/' + event.id,
             data: dataObj
           }).done(function(response) {
             // @todo return success?
